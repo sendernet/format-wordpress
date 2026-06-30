@@ -41,19 +41,20 @@ For each question/answer pair:
   `jsonAnswer` fields are identical. `images` is always `[]`.
 
 **Escaping inside the JSON attributes** (the `{...}` blob inside
-`<!-- wp:yoast/faq-block {...} -->`): the JSON sits inside an HTML comment, so
-characters that could break the comment or the surrounding HTML must be
-unicode-escaped:
+`<!-- wp:yoast/faq-block {...} -->`): any HTML tags in question or answer text
+must be unicode-escaped so the JSON stays valid inside an HTML comment:
 
-- `<` → `<`
-- `>` → `>`
-- `--` (any two consecutive hyphens) → `--`
+- `<` → `<` (**never** `&lt;` — HTML entities inside JSON render as literal text)
+- `>` → `>` (**never** `&gt;`)
+- `--` (two consecutive hyphens) → `--`
 
-Apply escaping to both `question`/`answer` and `jsonQuestion`/`jsonAnswer`,
-including the `<br><br>` joins (each join becomes
-`<br><br>` in the JSON). The visible HTML rendered below
-the comment (the `<div class="schema-faq...">`  markup) keeps real `<br>` tags
-and real `<`/`>`/`--` characters — only the JSON inside the comment is escaped.
+Apply to both `question`/`answer` and `jsonQuestion`/`jsonAnswer`, including
+inline tags like `<strong>`, `<em>`, `<br>`. A `<br><br>` join between
+paragraphs becomes `<br><br>` in the JSON.
+
+The visible HTML rendered below the comment (the `<div class="schema-faq...">`)
+keeps real tags — `<strong>`, `<br>`, etc. — only the JSON inside the comment
+is unicode-escaped.
 
 After the comment, emit the rendered HTML block exactly in this shape:
 

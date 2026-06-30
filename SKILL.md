@@ -1,46 +1,32 @@
 ---
 name: format-wordpress
-description: Format WordPress Gutenberg post markup. Handles two workflows — (1) new post: user pastes raw Gutenberg code to format; (2) post update: user sends either a markdown export from Google Docs or WP HTML with new content, and Claude merges it with the most recent Gutenberg output in the conversation. Global rules always apply; roundup rules apply automatically when the post reviews/compares tools or software; educational rules apply when the post is a how-to guide or tutorial. Triggers on /format-wordpress or when the user provides Gutenberg/WP block code and asks to format or update it.
+description: Format WordPress Gutenberg post markup. The user sends either Gutenberg HTML or a Markdown export from Google Docs, and Claude returns fully formatted Gutenberg HTML. Global rules always apply; roundup rules apply automatically when the post reviews/compares tools or software; educational rules apply when the post is a how-to guide or tutorial. Triggers on /format-wordpress or when the user provides Gutenberg/WP block code or markdown and asks to format it.
 ---
 
 # Format Gutenberg
 
-This skill handles two workflows:
+The user sends either Gutenberg HTML or a Markdown export (from Google Docs). Return
+fully formatted Gutenberg HTML in both cases.
 
-## Workflow 1 — New post
+**Detect the input type:**
+- Input contains `<!-- wp:... -->` block comment delimiters → **Gutenberg HTML**.
+  Apply all relevant formatting rules and return the full updated markup.
+- Input is plain text or markdown (no `<!-- wp:... -->` delimiters) → **Markdown**.
+  Convert the markdown to correct Gutenberg block markup and apply all relevant
+  formatting rules.
 
-The user provides raw WordPress Gutenberg post markup (block HTML with `<!-- wp:... -->`
-comment delimiters). Apply all relevant formatting rules and return the full updated
-markup in a single fenced code block.
+**Images in markdown input:** wherever an image appears in the markdown, output an
+empty `wp:image` block at that position — no inner HTML, just the block comments.
+Apply all relevant image formatting rules (attributes, size slug, etc.) but leave
+the content blank since the media library ID and URL are not known yet:
 
-## Workflow 2 — Post update
+```
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
 
-The user provides **two inputs**:
-1. The existing live Gutenberg code of the post (already formatted).
-2. A Google Docs copy-paste of the updated post content — plain text or lightly
-   formatted, containing additions, removals, and/or rewritten sections compared
-   to the live version.
+<!-- /wp:image -->
+```
 
-**How to merge:**
-- Treat the existing Gutenberg code as the authoritative source of structure and
-  formatting for all content that hasn't changed.
-- Diff the Google Docs content against the existing post to identify what is new,
-  removed, or rewritten.
-- For **removed** content: delete the corresponding Gutenberg blocks entirely.
-- For **unchanged** content: keep the existing Gutenberg blocks exactly as-is —
-  do not reformat or touch them.
-- For **new or rewritten** content: produce correct Gutenberg markup for it and
-  apply all relevant formatting rules to those blocks only.
-- Preserve all custom block attributes, anchors, classes, and IDs on unchanged blocks.
-- The Google Docs content is inconsistent — it sometimes includes banners, disclosure
-  blocks, methodology blocks, pros/cons blocks, and other special blocks, and sometimes
-  skips them entirely. Do not treat missing blocks in Google Docs as a signal to remove
-  them from the Gutenberg output. Focus on **text content changes** (new paragraphs,
-  rewritten sections, added/removed tools, updated copy) and ignore the presence or
-  absence of structural/banner blocks in the Google Docs paste.
-- If the scope of changes is unclear, ask the user to clarify before proceeding.
-
-In both workflows, apply the formatting rules below. Do not change anything the rules don't cover.
+Apply the formatting rules below. Do not change anything the rules don't cover.
 
 Rules are grouped into three categories:
 
@@ -86,6 +72,8 @@ overview, or roundup. Skip the whole section otherwise.
 - [Sender section CTAs](rules/roundup/sender-section-ctas.md)
 - [Convert FAQ section to Yoast FAQ block](rules/roundup/faq-yoast-block.md)
 - [Constrain images to 800px width](rules/roundup/image-width-800.md) — overrides the global image rule for roundup posts
+- [Rating card after first paragraph of each tool section](rules/roundup/rating-card.md) — fetch reviews from the Sender WP REST API and insert the rating card block
+- [Migration banner](rules/roundup/migration-banner.md) — **Alternative Solutions posts only**: insert one migration banner near migration-related content, with the main tool's name interpolated
 
 ## Educational rules
 
