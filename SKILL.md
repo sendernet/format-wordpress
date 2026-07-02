@@ -50,6 +50,7 @@ output shape, examples) are there, not in this index.
 
 Always apply all of:
 
+- [Strip the H1 — it's the post title, not body content](rules/global/strip-h1.md)
 - [Center all table columns](rules/global/center-table-columns.md)
 - [Bold the first row of every table](rules/global/first-row-bold.md)
 - [Link targets and rel attributes](rules/global/link-attributes.md)
