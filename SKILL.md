@@ -87,6 +87,8 @@ whole section otherwise.
 ## Output
 
 - Return the complete formatted markup, not just the changed parts.
+- Output the result directly in the chat as a fenced code block. Never write it to a file.
 - Use **one single fenced code block** for the entire post. Never split the output across multiple code blocks regardless of post length.
-- Do not put any text, commentary, headings, or "continuing from…" notes between code blocks. The entire formatted post must appear as one unbroken fenced block.
+- If you have any notes, concerns, or questions about the content, state them **before** the code block — never after it.
+- Do not put any text, commentary, headings, or "continuing from…" notes between or after code blocks. The entire formatted post must appear as one unbroken fenced block with nothing following it.
 - Don't add commentary inside the code block.
