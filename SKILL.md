@@ -57,6 +57,7 @@ Always apply all of:
 - [Only Sender pricing links are allowed](rules/global/no-competitor-pricing-links.md)
 - [Center images and use full size](rules/global/image-center-full.md)
 - [Headings must not be bold](rules/global/headings-not-bold.md)
+- [Move table footnote paragraphs into figcaption](rules/global/table-footnote-caption.md)
 
 ## Roundup rules (Alternative Solutions / Software Overviews)
 
