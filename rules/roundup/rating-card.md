@@ -52,6 +52,21 @@ Derive these four fields from the review before building the block:
 
 ### JSON comment
 
+> **CRITICAL — `link`, `linkText`, `target`, `isNofollow` MUST live INSIDE the
+> `card` object**, as siblings of `reviewId` and `reviewData`. The block's
+> `save()` reads them as `card.link`, `card.target`, `card.isNofollow`,
+> `card.linkText`. If you place them at the top level (as siblings of `card`),
+> `card.link` is `undefined`, `save()` renders no `<a>` at all, and WordPress
+> flags the block as invalid ("Attempt Block Recovery") — recovery then wipes
+> the link entirely.
+>
+> Concretely, the closing braces after the ratings array are exactly
+> **`]}}}}`** (four) — this closes `overall_rating`, `pros_cons`, `review_data`,
+> and `reviewData`, leaving `card` still open so the link fields nest inside it.
+> A fifth `}` here is the bug: it closes `card` early and breaks the block.
+> After building the comment, verify the JSON parses and that
+> `parsed.card.link` exists (not `parsed.link`).
+
 ```
 <!-- wp:competitor-review-blocks/rating-card {"card":{"reviewId":"{id_string}","reviewData":{"id":{id_number},"slug":"{slug}","review_data":{"pros_cons":{"brand_logo":"{brand_logo}","brand_name":"{brand_name}","competitor_website_url":"{competitor_website_url}","overall_rating":{"value":"{overall_value}","external_ratings":[{external_ratings_json}]}}}},"link":"{link}","linkText":"{linkText}","target":"_blank","isNofollow":{isNofollow}}} -->
 ```
