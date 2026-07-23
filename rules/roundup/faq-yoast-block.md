@@ -41,16 +41,27 @@ For each question/answer pair:
   `jsonAnswer` fields are identical. `images` is always `[]`.
 
 **Escaping inside the JSON attributes** (the `{...}` blob inside
-`<!-- wp:yoast/faq-block {...} -->`): any HTML tags in question or answer text
-must be unicode-escaped so the JSON stays valid inside an HTML comment:
+`<!-- wp:yoast/faq-block {...} -->`): the JSON must be strictly valid. Apply
+all four rules below to both `question`/`answer` and `jsonQuestion`/`jsonAnswer`:
 
-- `<` → `<` (**never** `&lt;` — HTML entities inside JSON render as literal text)
-- `>` → `>` (**never** `&gt;`)
-- `--` (two consecutive hyphens) → `--`
+1. **Angle brackets** — unicode-escape so the tags don't conflict with the HTML
+   comment parser:
+   - `<` → `<` (**never** `&lt;` — HTML entities inside JSON render as literal text)
+   - `>` → `>` (**never** `&gt;`)
+2. **Double-quote characters inside HTML attribute values** — any `"` that
+   appears inside an HTML tag (e.g. `href="…"`, `target="_blank"`) must be
+   escaped as `\"` in the JSON string. Example: an anchor becomes
+   `<a href=\"https://example.com\" target=\"_blank\" rel=\"noopener\">text</a>`.
+3. **Literal newline / carriage-return characters** — strip them. A raw newline
+   inside a JSON string is a hard syntax error. If "Gmail" or any other word
+   sits on its own line in the source (e.g. from a Google Docs export), fold it
+   inline with the surrounding sentence and remove the surrounding whitespace.
+4. **Double-hyphen sequences** — `--` (two consecutive hyphens) would close the
+   HTML comment early; escape as `--`.
 
-Apply to both `question`/`answer` and `jsonQuestion`/`jsonAnswer`, including
-inline tags like `<strong>`, `<em>`, `<br>`. A `<br><br>` join between
-paragraphs becomes `<br><br>` in the JSON.
+Inline tags like `<strong>`, `<em>`, `<br>` follow
+rule 1 + 2 above. A `<br><br>` join between paragraphs is
+the correct JSON representation of the paragraph break.
 
 The visible HTML rendered below the comment (the `<div class="schema-faq...">`)
 keeps real tags — `<strong>`, `<br>`, etc. — only the JSON inside the comment
