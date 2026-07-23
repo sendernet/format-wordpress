@@ -38,6 +38,15 @@ Set two string attributes:
 
 Don't add other attributes.
 
+**HTML entity decoding (critical):** Before placing item text into the JSON
+attribute, decode all HTML entities to their actual Unicode characters. For
+example, `&#8217;` → `'`, `&amp;` → `&`, `&lt;` → `<`, `&gt;` → `>`,
+`&quot;` → `"`, `&#8216;` → `'`, `&#8220;` → `"`, `&#8221;` → `"`,
+`&ndash;` / `&#8211;` → `–`, `&mdash;` / `&#8212;` → `—`. Never leave
+numeric or named HTML entities inside the JSON string values — they render
+as literal text in the frontend because HTML comments are not HTML-decoded
+by the browser.
+
 ### Rendered HTML
 
 Emit this exact structure below the comment (single line in the file, broken
